@@ -1,7 +1,7 @@
 # NeuroScript
 
 > ### ⚠️ **Alpha software.** NeuroScript is a solo project
-> *however*, I do have 18+ years of experience, and AuDHD. 
+> *however*, I do have 18+ years of experience. 
 >
 > #### It moves fast, breaks occasionally, and gets hyperfocused on interesting problems. Expect rough edges. Contributions and bug reports very welcome.
 
