@@ -25,9 +25,9 @@ neuron GPT2Small(vocab_size=50257, d_model=768, num_heads=12, d_ff=3072, num_lay
 `unroll(num_layers)` expands at compile time — 12 independent `TransformerBlock` instances,
 each with their own weights, chained sequentially. One declaration. Zero boilerplate.
 
-**[Try it in the playground →](https://severeon.github.io/playground)**
+**[Try it in the playground →](https://neuroscript-lang.com/playground)**
 &nbsp;·&nbsp;
-**[Read the docs →](https://severeon.github.io/docs/intro)**
+**[Read the docs →](https://neuroscript-lang.com/docs/intro)**
 
 ---
 
