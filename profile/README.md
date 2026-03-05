@@ -258,6 +258,69 @@ neuroscript validate my_model.ns
 
 ---
 
+## Research context
+
+NeuroScript addresses several well-documented shortcomings in contemporary neural network
+research and engineering. The papers below expose these problems; the corresponding
+NeuroScript features are noted alongside each.
+
+### Reproducibility and transparency
+
+> *"The reproducibility of scientific findings are an important hallmark of quality and
+> integrity in research … unfortunately, many publications fall short of this mark."*
+
+- **Tanksley, Hier & Wunsch II** (2022). [Reproducing Neural Network Research Findings via Reverse Engineering](https://eujournal.org/index.php/esj/article/view/15135). *European Scientific Journal, ESJ* 18(4), 61. &mdash; Documents how insufficient detail in neural network publications makes independent reproduction difficult or impossible, even for landmark results like AlphaGo Zero.
+
+- **Semmelrock et al.** (2025). [Reproducibility in Machine-Learning-Based Research: Overview, Barriers and Drivers](https://onlinelibrary.wiley.com/doi/10.1002/aaai.70002). *AI Magazine*. &mdash; Identifies five pillars of ML reproducibility (code versioning, data access, data versioning, experiment logging, pipeline creation) and finds that many published results are not reproducible in principle due to lack of transparency, missing code, and sensitivity of training conditions.
+
+- **Desai et al.** (2025). [What is Reproducibility in AI and ML Research?](https://onlinelibrary.wiley.com/doi/full/10.1002/aaai.70004) *AI Magazine*. &mdash; Introduces a reproducibility framework and argues that computational requirements and system complexity make even well-documented work infeasible to reproduce for most teams.
+
+**How NeuroScript helps:** A `.ns` file is a complete, deterministic architecture specification. The compiler produces identical PyTorch output from the same source every time. Shape contracts, layer connectivity, and weight-sharing semantics are explicit in the source &mdash; there is nothing implicit to reverse-engineer. The Axon package manager adds SHA-256 checksums and Ed25519 signatures so that published architectures can be fetched and verified cryptographically.
+
+### Dimension mismatch and deep learning bugs
+
+> *"The most common bug fix patterns are fixing data dimension and neural network connectivity."*
+
+- **Islam, Pan, Nguyen & Rajan** (2020). [Repairing Deep Neural Networks: Fix Patterns and Challenges](https://dl.acm.org/doi/10.1145/3377811.3380378). *ICSE 2020*, 1135&ndash;1146. &mdash; Studied 970 bug repairs across five DL libraries and found that dimension mismatches and connectivity errors are the most frequent bug category, that fixes risk introducing adversarial vulnerabilities, and that bug localization is a major developer challenge.
+
+- **Zhang et al.** (2020). [An Empirical Study on Program Failures of Deep Learning Jobs](https://hongyujohn.github.io/icse20-main-199.pdf). *ICSE 2020*. &mdash; Analyzed 4,960 real failures from Microsoft's deep learning platform. 13.5% were DL-specific failures caused by inappropriate model parameters/structures and API misunderstanding, surfacing only at runtime.
+
+**How NeuroScript helps:** Every neuron declares explicit `in:` and `out:` shape contracts. The compiler performs full shape inference across the entire graph and rejects dimension mismatches *at compile time*, before any training run begins. There is no runtime surprise &mdash; a program that compiles will not crash due to shape errors.
+
+### Technical debt in ML systems
+
+> *"Machine learning: the high-interest credit card of technical debt."*
+
+- **Sculley et al.** (2015). [Hidden Technical Debt in Machine Learning Systems](https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems). *NeurIPS 2015*. &mdash; Google engineers document how ML systems accumulate massive maintenance costs through boundary erosion, entanglement, glue code, and configuration debt. Only a small fraction of real-world ML code is the model itself; the surrounding infrastructure dominates.
+
+**How NeuroScript helps:** NeuroScript separates architecture definition from training infrastructure, optimizer configuration, and data pipelines. A neuron definition is pure structure with no glue code, no implicit global state, and no entangled dependencies. The "neurons all the way down" abstraction enforces clean compositional boundaries at every level. Compiled output is self-contained, auditable PyTorch &mdash; no hidden framework coupling.
+
+### AI trustworthiness and transparency
+
+> *"Trust in AI is shaped by transparency, accuracy, and interpretability."*
+
+- **Liu, Sandjaja & Wunsch** (2024). [AI Trustworthy: Ethical Challenges and Strategies](https://ieeexplore.ieee.org/document/10956105/). *IEEE SOLI 2024*, 1&ndash;6. &mdash; Proposes a framework linking AI transparency to user trust and argues that interpretability and auditability are prerequisites for trustworthy AI deployment across sectors like healthcare and autonomous vehicles.
+
+**How NeuroScript helps:** NeuroScript compiles to readable, idiomatic `nn.Module` code that developers can audit line by line. There is no opaque intermediate representation and no black-box framework magic. The source `.ns` file reads like documentation of the architecture, and the compiled output is standard Python that any PyTorch user can inspect, modify, and reason about.
+
+### Model interoperability and sharing
+
+- **Daoudi et al.** (2025). [Neural Network Interoperability Across Platforms](https://arxiv.org/abs/2511.02610). *arXiv:2511.02610*. &mdash; Documents how migrating neural network implementations across libraries is challenging due to the lack of standardized specification, and proposes metamodel-based approaches to bridge frameworks.
+
+- **Brito da Silva, Elnabarawy & Wunsch II** (2019). [A Survey of Adaptive Resonance Theory Neural Network Models for Engineering Applications](https://arxiv.org/abs/1905.11437). *Neural Networks* 120, 167&ndash;203. &mdash; Surveys 30 years of ART models, noting that useful engineering properties like speed, configurability, and explainability are difficult to replicate across implementations. Highlights that order-dependence and parameter sensitivity complicate reproducible deployment.
+
+**How NeuroScript helps:** A `.ns` file is a framework-independent architecture specification. Today it compiles to PyTorch; the same source can target future backends without changing the architecture definition. Higher-order neurons and contract dispatch allow generic, reusable components that compose without framework-specific glue. The Axon package manager enables sharing architectures as versioned, signed packages rather than ad-hoc Python files.
+
+### ML supply chain security
+
+- **Australian Cyber Security Centre** (2025). [AI and ML Supply Chain Risks and Mitigations](https://www.cyber.gov.au/business-government/secure-design/artificial-intelligence/artificial-intelligence-and-machine-learning-supply-chain-risks-and-mitigations). &mdash; Reports that serialized model files containing malicious content continue to be uploaded to popular sharing platforms undetected, and that ~25% of organizations surveyed had been victims of AI data poisoning.
+
+- **Jiang et al.** (2025). [Supply-Chain Attacks in Machine Learning Frameworks](https://openreview.net/pdf?id=EH5PZW6aCr). *OpenReview*. &mdash; Demonstrates real-world supply chain attacks on ML frameworks, including malicious dependencies that exploit unsafe serialization formats like Python Pickle.
+
+**How NeuroScript helps:** Axon packages are plain-text `.ns` source files &mdash; not serialized binary objects, not Pickle, not executable code. Every package is checksummed (SHA-256 per file) and signed (Ed25519 over the package checksum). The compiler verifies signatures on fetch. Because the source is human-readable and the output is standard Python, there is no vector for hidden executable payloads in the architecture definition itself.
+
+---
+
 ## Support development
 
 NeuroScript is a solo project. Sponsoring funds development time directly.
